@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  **/
 @Configuration
 @EnableResourceServer   //开启资源服务校验
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)//开启方法安全校验
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)//开启方法安全校验 激活方法发preauthorize注解
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     //公钥
     private static final String PUBLIC_KEY = "public.key";

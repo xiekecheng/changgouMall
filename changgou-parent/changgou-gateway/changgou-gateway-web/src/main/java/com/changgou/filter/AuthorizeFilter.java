@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -47,29 +48,54 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
             return filter;
         }
 
+        //从头文件中获取令牌
         String token = request.getHeaders().getFirst(AUTHORIZE_TOKEN);
+        boolean hastoken = true;
 
         //如果头文件中没有，则从请求参数中获取
         if (StringUtils.isEmpty(token)) {
             token = request.getQueryParams().getFirst(AUTHORIZE_TOKEN);
+            hastoken=false;
+        }
+        //如果请求参数没有令牌,则从cookie中获取token
+        if (StringUtils.isEmpty(token)){
+            HttpCookie first = request.getCookies().getFirst(AUTHORIZE_TOKEN);
+            if (first!=null){
+                token=first.getValue();
+            }
         }
 
-        //如果为空，则输出错误代码
+
+         //如果没有令牌,则拦截
         if (StringUtils.isEmpty(token)) {
-            //设置方法不允许被访问，405错误代码
-            response.setStatusCode(HttpStatus.METHOD_NOT_ALLOWED);
+            //设置方法不允许被访问，401错误代码
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            //响应空数据
             return response.setComplete();
+        }else {
+            if (!hastoken){
+                if (!token.startsWith("bearer ")&&!token.startsWith("Bearer ")){
+                    token+="bearer ";
+                }
+                request.mutate().header("AUTHORIZE_TOKEN",token);
+            }
+
         }
 
-        //解析令牌数据
-        try {
-            Claims claims = JwtUtil.parseJWT(token);
-        } catch (Exception e) {
-            e.printStackTrace();
-            //解析失败，响应401错误
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
-            return response.setComplete();
-        }
+//        //解析令牌数据
+//        try {
+//            Claims claims = JwtUtil.parseJWT(token);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            //解析失败，响应401错误
+//            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+//            return response.setComplete();
+//        }
+
+
+
+
+
 
         //放行
         return chain.filter(exchange);
