@@ -40,17 +40,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         //没有认证统一采用httpbasic认证，httpbasic中存储了client_id和client_secret，开始认证client_id和client_secret
         if(authentication==null){
+            //查询数据库 oauth_client_details
             ClientDetails clientDetails = clientDetailsService.loadClientByClientId(username);
             if(clientDetails!=null){
                 //秘钥
                 String clientSecret = clientDetails.getClientSecret();
                 //静态方式
-                return new User(username,new BCryptPasswordEncoder().encode(clientSecret), AuthorityUtils.commaSeparatedStringToAuthorityList(""));
+                //return new User(username,//客户端ID
+                //        new BCryptPasswordEncoder().encode(clientSecret),//客户端秘钥->加密
+                //        AuthorityUtils.commaSeparatedStringToAuthorityList(""));
                 //数据库查找方式
-                //return new User(username,clientSecret, AuthorityUtils.commaSeparatedStringToAuthorityList(""));
+                return new User(username,clientSecret, AuthorityUtils.commaSeparatedStringToAuthorityList(""));
             }
         }
 
+        //用户账号密码信息认证 start
         if (StringUtils.isEmpty(username)) {
             return null;
         }
@@ -58,11 +62,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         //根据用户名查询用户信息
         String pwd = new BCryptPasswordEncoder().encode("szitheima");
         //创建User对象 指定用户的角色信息
-        String permissions = "user,vip";
+        String permissions = "user,vip,admin";
 
 
         UserJwt userDetails = new UserJwt(username,pwd,AuthorityUtils.commaSeparatedStringToAuthorityList(permissions));
 
+        //用户账号密码信息认证 end
 
         //userDetails.setComy(songsi);
         return userDetails;

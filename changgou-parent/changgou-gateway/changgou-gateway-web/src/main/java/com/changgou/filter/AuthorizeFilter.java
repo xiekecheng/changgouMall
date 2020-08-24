@@ -75,9 +75,9 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         }else {
             if (!hastoken){
                 if (!token.startsWith("bearer ")&&!token.startsWith("Bearer ")){
-                    token+="bearer ";
+                    token="bearer "+token;
                 }
-                request.mutate().header("AUTHORIZE_TOKEN",token);
+                request.mutate().header(AUTHORIZE_TOKEN,token);
             }
 
         }

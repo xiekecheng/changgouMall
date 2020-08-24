@@ -150,7 +150,7 @@ public class UserController {
      * @return
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('user')")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public Result<List<User>> findAll(){
         //调用UserService实现查询所有User
         List<User> list = userService.findAll();
