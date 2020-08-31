@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * @author xiekecheng
+ */
 @FeignClient(name="user")
 @RequestMapping("/user")
 public interface UserFeign {

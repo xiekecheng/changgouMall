@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Jwts;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.RsaSigner;
@@ -61,5 +62,11 @@ public class CreateJwtTest {
         //取出令牌
         String encoded = jwt.getEncoded();
         System.out.println(encoded);
+    }
+    @Test
+    public void CreatePwd(){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String pwd = encoder.encode("zhangsang");
+        System.out.println(pwd);
     }
 }
